@@ -1,9 +1,9 @@
 {
   "name": "controle-coletas",
   "version": "0.0.1",
-  "description": "A Quasar Project",
+  "description": "Desafio técnico KL GAMA – Controle de Coletas",
   "productName": "Controle de Coletas",
-  "author": "Karol <karolindaana36@gmail.com>",
+  "author": "Ana Carolina Souza",
   "type": "module",
   "private": true,
   "scripts": {
