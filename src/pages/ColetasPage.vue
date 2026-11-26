@@ -1,6 +1,6 @@
 <template>
   <q-page padding>
-    <div class="row items-center q-my-md">
+    <div class="row items-center q-my-md q-gutter-y-sm">
       <h1 class="text-h5 q-my-none">Coletas</h1>
       <q-space />
       <q-btn
@@ -23,39 +23,41 @@
       />
     </div>
 
-    <div class="cartao q-pa-md q-mb-md row q-col-gutter-sm items-center">
-      <q-input
-        v-model="filtros.busca"
-        label="Buscar cliente"
-        outlined
-        dense
-        clearable
-        class="col-12 col-sm-4"
-      >
-        <template #prepend>
-          <q-icon name="search" />
-        </template>
-      </q-input>
-      <q-select
-        v-model="filtros.status"
-        :options="[...STATUS_COLETA]"
-        label="Status"
-        outlined
-        dense
-        clearable
-        class="col-12 col-sm-3"
-      />
-      <q-select
-        v-model="filtros.tipoResiduo"
-        :options="[...TIPOS_RESIDUO]"
-        label="Tipo de resíduo"
-        outlined
-        dense
-        clearable
-        class="col-12 col-sm-3"
-      />
-      <div class="col-12 col-sm-2 text-right texto-secundario">
-        {{ coletasFiltradas.length }} de {{ store.coletas.length }} coletas
+    <div class="cartao q-pa-md q-mb-md">
+      <div class="row q-col-gutter-sm items-center">
+        <q-input
+          v-model="filtros.busca"
+          label="Buscar cliente"
+          outlined
+          dense
+          clearable
+          class="col-12 col-sm-4"
+        >
+          <template #prepend>
+            <q-icon name="search" />
+          </template>
+        </q-input>
+        <q-select
+          v-model="filtros.status"
+          :options="[...STATUS_COLETA]"
+          label="Status"
+          outlined
+          dense
+          clearable
+          class="col-12 col-sm-3"
+        />
+        <q-select
+          v-model="filtros.tipoResiduo"
+          :options="[...TIPOS_RESIDUO]"
+          label="Tipo de resíduo"
+          outlined
+          dense
+          clearable
+          class="col-12 col-sm-3"
+        />
+        <div class="col-12 col-sm-2 text-right texto-secundario">
+          {{ coletasFiltradas.length }} de {{ store.coletas.length }} coletas
+        </div>
       </div>
     </div>
 
@@ -65,6 +67,7 @@
       :rows="coletasFiltradas"
       :columns="colunas"
       row-key="id"
+      :grid="$q.screen.lt.md"
       :no-data-label="
         store.coletas.length
           ? 'Nenhuma coleta encontrada com esses filtros.'
@@ -103,6 +106,47 @@
             <q-tooltip>Excluir</q-tooltip>
           </q-btn>
         </q-td>
+      </template>
+
+      <!-- No celular a tabela vira uma lista de cartões -->
+      <template #item="props">
+        <div class="col-12 q-pa-xs">
+          <q-card flat bordered class="q-pa-sm">
+            <div class="row items-center no-wrap">
+              <div class="col">
+                <div class="text-weight-medium">{{ props.row.cliente }}</div>
+                <div class="texto-secundario text-caption">
+                  {{ formatarData(props.row.dataColeta) }} · {{ props.row.tipoResiduo }} ·
+                  {{ formatarKg(props.row.pesoKg) }}
+                </div>
+              </div>
+              <q-badge :color="corDoStatus(props.row.status)" :label="props.row.status" />
+            </div>
+            <div v-if="props.row.observacao" class="text-caption q-mt-xs">
+              {{ props.row.observacao }}
+            </div>
+            <div class="row justify-end">
+              <q-btn
+                icon="edit"
+                flat
+                round
+                dense
+                color="grey-8"
+                aria-label="Editar"
+                @click="abrirEdicao(props.row)"
+              />
+              <q-btn
+                icon="delete"
+                flat
+                round
+                dense
+                color="negative"
+                aria-label="Excluir"
+                @click="confirmarExclusao(props.row)"
+              />
+            </div>
+          </q-card>
+        </div>
       </template>
     </q-table>
 
