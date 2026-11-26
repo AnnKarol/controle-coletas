@@ -1,5 +1,6 @@
 import { defineStore, acceptHMRUpdate } from 'pinia';
 import type { Coleta, DadosColeta } from '@/types/coleta';
+import { gerarDadosExemplo } from '@/utils/dados-exemplo';
 
 // Nome da "gaveta" onde as coletas ficam guardadas no navegador
 const CHAVE_STORAGE = 'ecocoleta:coletas';
@@ -43,6 +44,14 @@ export const useColetasStore = defineStore('coletas', {
         return;
       }
       this.coletas[posicao] = { id, ...dados };
+      this.salvar();
+    },
+
+    // Preenche com dados fictícios para demonstração
+    carregarExemplos() {
+      for (const dados of gerarDadosExemplo()) {
+        this.coletas.push({ id: crypto.randomUUID(), ...dados });
+      }
       this.salvar();
     },
 

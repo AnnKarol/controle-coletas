@@ -148,6 +148,22 @@
           </q-card>
         </div>
       </template>
+
+      <template #no-data="{ message }">
+        <div class="full-width column items-center q-py-lg texto-secundario">
+          <div>{{ message }}</div>
+          <q-btn
+            v-if="store.coletas.length === 0"
+            label="Carregar dados de exemplo"
+            icon="auto_awesome"
+            flat
+            color="primary"
+            no-caps
+            class="q-mt-sm"
+            @click="store.carregarExemplos()"
+          />
+        </div>
+      </template>
     </q-table>
 
     <ColetaFormDialog v-model="dialogAberto" :coleta="coletaEmEdicao" @salvar="salvar" />
