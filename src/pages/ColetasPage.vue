@@ -13,13 +13,53 @@
       />
     </div>
 
+    <div class="cartao q-pa-md q-mb-md row q-col-gutter-sm items-center">
+      <q-input
+        v-model="filtros.busca"
+        label="Buscar cliente"
+        outlined
+        dense
+        clearable
+        class="col-12 col-sm-4"
+      >
+        <template #prepend>
+          <q-icon name="search" />
+        </template>
+      </q-input>
+      <q-select
+        v-model="filtros.status"
+        :options="[...STATUS_COLETA]"
+        label="Status"
+        outlined
+        dense
+        clearable
+        class="col-12 col-sm-3"
+      />
+      <q-select
+        v-model="filtros.tipoResiduo"
+        :options="[...TIPOS_RESIDUO]"
+        label="Tipo de resíduo"
+        outlined
+        dense
+        clearable
+        class="col-12 col-sm-3"
+      />
+      <div class="col-12 col-sm-2 text-right texto-secundario">
+        {{ coletasFiltradas.length }} de {{ store.coletas.length }} coletas
+      </div>
+    </div>
+
     <q-table
       class="cartao"
       flat
-      :rows="store.coletasOrdenadas"
+      :rows="coletasFiltradas"
       :columns="colunas"
       row-key="id"
-      no-data-label="Nenhuma coleta cadastrada ainda."
+      :no-data-label="
+        store.coletas.length
+          ? 'Nenhuma coleta encontrada com esses filtros.'
+          : 'Nenhuma coleta cadastrada ainda.'
+      "
       :pagination="{ rowsPerPage: 10 }"
     >
       <template #body-cell-status="props">
@@ -61,12 +101,15 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
+import { computed, ref } from 'vue';
 import { useQuasar } from 'quasar';
 import type { QTableColumn } from 'quasar';
 import ColetaFormDialog from '@/components/ColetaFormDialog.vue';
 import { useColetasStore } from '@/stores/coletas-store';
+import { STATUS_COLETA, TIPOS_RESIDUO } from '@/types/coleta';
 import type { Coleta, DadosColeta, StatusColeta } from '@/types/coleta';
+import { filtrarColetas } from '@/utils/filtros';
+import type { FiltrosColeta } from '@/utils/filtros';
 import { formatarData, formatarKg } from '@/utils/formatacao';
 
 const store = useColetasStore();
@@ -74,6 +117,14 @@ const $q = useQuasar();
 const dialogAberto = ref(false);
 // Coleta que está sendo editada. Quando é null, o formulário cadastra uma nova.
 const coletaEmEdicao = ref<Coleta | null>(null);
+
+// Filtros da lista (requisito 5) e busca por cliente (diferencial)
+const filtros = ref<FiltrosColeta>({ status: null, tipoResiduo: null, busca: '' });
+
+// computed: recalcula sozinho sempre que as coletas ou os filtros mudam
+const coletasFiltradas = computed(() =>
+  filtrarColetas(store.coletasOrdenadas, { ...filtros.value, busca: filtros.value.busca ?? '' }),
+);
 
 // As colunas da tabela: o que mostrar e como formatar
 const colunas: QTableColumn<Coleta>[] = [
