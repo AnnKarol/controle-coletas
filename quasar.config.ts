@@ -48,7 +48,8 @@ export default defineConfig((/* ctx */) => {
       vueRouterMode: 'hash', // available values: 'hash', 'history'
       // vueRouterBase,
 
-      // publicPath: '/',
+      // No GitHub Pages o site fica em /controle-coletas/ (definido no workflow de deploy)
+      publicPath: process.env.PUBLIC_PATH ?? '/',
       // define: {},
       // defineEnv: {}
       // ignorePublicFolder: true,
