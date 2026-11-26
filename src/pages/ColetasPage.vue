@@ -4,6 +4,16 @@
       <h1 class="text-h5 q-my-none">Coletas</h1>
       <q-space />
       <q-btn
+        label="Exportar CSV"
+        icon="download"
+        flat
+        color="grey-8"
+        no-caps
+        class="q-mr-sm"
+        :disable="coletasFiltradas.length === 0"
+        @click="exportarCsv"
+      />
+      <q-btn
         label="Nova coleta"
         icon="add"
         color="primary"
@@ -102,7 +112,7 @@
 
 <script setup lang="ts">
 import { computed, ref } from 'vue';
-import { useQuasar } from 'quasar';
+import { exportFile, useQuasar } from 'quasar';
 import type { QTableColumn } from 'quasar';
 import ColetaFormDialog from '@/components/ColetaFormDialog.vue';
 import { useColetasStore } from '@/stores/coletas-store';
@@ -110,6 +120,7 @@ import { STATUS_COLETA, TIPOS_RESIDUO } from '@/types/coleta';
 import type { Coleta, DadosColeta, StatusColeta } from '@/types/coleta';
 import { filtrarColetas } from '@/utils/filtros';
 import type { FiltrosColeta } from '@/utils/filtros';
+import { gerarCsv } from '@/utils/csv';
 import { formatarData, formatarKg } from '@/utils/formatacao';
 
 const store = useColetasStore();
@@ -182,5 +193,16 @@ function confirmarExclusao(coleta: Coleta) {
     store.excluir(coleta.id);
     $q.notify({ type: 'info', message: 'Coleta excluída.' });
   });
+}
+
+// Baixa a lista que está na tela (com os filtros aplicados) em CSV (diferencial)
+function exportarCsv() {
+  // O \ufeff no começo faz o Excel reconhecer os acentos
+  const baixou = exportFile('coletas.csv', '\ufeff' + gerarCsv(coletasFiltradas.value), {
+    mimeType: 'text/csv;charset=utf-8',
+  });
+  if (baixou !== true) {
+    $q.notify({ type: 'negative', message: 'O navegador bloqueou o download.' });
+  }
 }
 </script>
